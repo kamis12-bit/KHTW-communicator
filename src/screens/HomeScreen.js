@@ -1,8 +1,14 @@
 import React from 'react'
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, FlatList, Pressable, Image} from 'react-native'
 import { auth } from '../firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/core'
+
+const defaultUsers = [
+    {id: 1, name:'Alex', avatar: require('../assets/cat.jpg')},
+    {id: 2, name:'Sara', avatar: require('../assets/cat1.jpeg')},
+    {id: 3, name:'Max', avatar: require('../assets/cat2.jpeg')},
+]
 
 const HomeScreen = () => {
     const navigation = useNavigation()
@@ -15,17 +21,35 @@ const HomeScreen = () => {
             .catch(error => alert(error.message))
     }
 
+    const renderUser=({item}) => {
+        return <Pressable onPress={()=> {navigation.replace("Chat")} } style    ={styles.row}>
+            <Image style={styles.avatar} source={item.avatar}/>
+            <Text> {item.name} </Text>
+        </Pressable>
+    };
 
     return (
+        <>
+        <View>
+         
+            <FlatList
+                data={defaultUsers}
+                renderItem={renderUser}
+                keyExtractor={item=>item.id.toString()} />
+        
+        </View>
+
         <View style={styles.container}>
-            <Text>Email: {auth.currentUser?.email}</Text>
-            <TouchableOpacity
+        <TouchableOpacity
                 onPress={handleSignOut}
                 style={styles.button}
             >
                 <Text style={styles.buttonText}>Sign out</Text>
             </TouchableOpacity>
         </View>
+
+        </>
+        
     )
 }
 
@@ -37,6 +61,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    list: {
+        flex: 1,
+        justifyContent: 'left',
+        alignItems: 'left'
+    },
 
     button: {
         backgroundColor: 'blue',
@@ -45,6 +74,8 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         marginTop: 40,
+        position: 'absolute',
+        bottom:20,
     },
 
     buttonText: {
@@ -67,6 +98,18 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 16,
 
-    }
+    },
+    row: {
+        flexDirection:'row',
+        padding:10,
+        alignItems:'center',
+        borderBottomColor:'#cacaca',
+        borderBottomWidth:1,
+    },
+    avatar: {
+        width:50,
+        height:50,
+        marginRight:10,
+    },
 
 })

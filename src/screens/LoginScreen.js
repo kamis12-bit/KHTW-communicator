@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAvoidingView, TextInput, TouchableOpacity } from 'react-native'
@@ -42,11 +41,16 @@ const LoginScreen = () => {
     }
 
     return (
+
+        <>
+
         <KeyboardAvoidingView
             style={styles.container}
             behaviour="padding"
         >
-            <Text> Hello, this is the LoginScreen </Text>
+
+            <Text style={styles.title}>  KHTW - communicator </Text>
+            <Text> Login or register with email below </Text>
             <View style={styles.inputContainer}>
                 <TextInput
                     placeholder="Email"
@@ -79,6 +83,7 @@ const LoginScreen = () => {
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
+        </>
     )
 }
 
@@ -139,6 +144,13 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 16,
 
+    },
+    title: {
+        color: 'blue',
+        fontWeight: '700',
+        fontSize: 20,
+        textAlign: 'center',
+        marginBottom: 5
     }
 
 

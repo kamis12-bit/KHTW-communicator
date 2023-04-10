@@ -4,4 +4,8 @@ Trello link: https://trello.com/invite/b/UbTO7idP/ATTIff61a51ed066534550dc498f25
 When cloning repository, need to do "npm install" to install needed packages (node_modules/ is in .gitignore since it's quite large).
 To start app run in src/ command: "npx expo start"
 
-"npm install expo" if it doesn't work 
+You might need to install:
+
+"npm install expo"
+
+"npm install --save react-native-gifted-chat"
