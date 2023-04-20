@@ -1,10 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Image, Pressable, StyleSheet, View } from "react-native";
-import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Button,
+  Modal,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+
+} from "react-native";
+import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
 
-//options for MathJax
+// options for MathJax
 const mmlOptions = {
   messageStyle: "none",
   extensions: ["tex2jax.js"],
@@ -30,6 +42,7 @@ const mmlOptions = {
   },
 };
 
+
 export default function ChatScreen() {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
@@ -41,8 +54,8 @@ export default function ChatScreen() {
         backgroundColor: "white",
       }}
     />
-  );
-
+  ); 
+  
   useEffect(() => {
     setMessages([
       {
@@ -75,6 +88,72 @@ export default function ChatScreen() {
     );
   }
 
+
+  
+ const formluasWindow = () => {
+    const formulas = [
+  'Pythagorean theorem: a² + b² = c²',
+  'Quadratic formula: x = (-b ± sqrt(b² - 4ac)) / 2a',
+  'Sum of angles in a triangle: 180°',
+  'Area of a circle: A = πr²',
+  // add more formulas as needed
+];
+    return (
+    <View style={styles.container}>
+      {formulas.map((formula, index) => (
+        <View key={index} style={styles.formulaContainer}>
+          <Text style={styles.formulaText}>{formula}</Text>
+        </View>
+      ))}
+    </View>
+  );
+  }
+  
+handleActionPress =() => {
+   return (
+    <View
+      style={{
+        flexDirection: 'row',
+        height: 100,
+        padding: 20,
+      }}>
+      <View style={{backgroundColor: 'blue', flex: 0.3}} />
+      <View style={{backgroundColor: 'red', flex: 0.5}} />
+      <Text>Hello World!</Text>
+    </View>
+  );
+  
+
+  };
+  
+  const renderActions =  (props) => {
+    return (
+    <Actions
+            {...props}
+            options={{
+                ['Document']: async (props) => {
+                    try {
+                        const result = await DocumentPicker.pick({
+                            type: [DocumentPicker.types.pdf],
+                        });
+                       console.log("image file",result)
+                    } catch (e) {
+                        if (DocumentPicker.isCancel(e)) {
+                            console.log("User cancelled!")
+                        } else {
+                            throw e;
+                        }
+                    }
+
+                },
+                Cancel: (props) => { console.log("Cancel") }
+            }}
+            onSend={args => console.log(args)}
+        />
+    );
+  };
+
+
   return (
     <>
       <Pressable
@@ -93,6 +172,7 @@ export default function ChatScreen() {
           onSend(messages);
         }}
         user={{ _id: 1 }}
+       renderActions={() => renderActions()}
         renderMessageText={({ currentMessage }) => (
           <CustomMessage message={currentMessage} />
         )}
@@ -102,6 +182,38 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
+formulas : {
+  height: 500,
+    width: 500,
+    position: "absolute",
+    backgroundColor: 'powderblue',
+},
+
+container: {
+    flex: 1,
+    padding: 20,
+  },
+  formulaContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  formulaText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+
+
   actionBar: {
     backgroundColor: "#cacaca",
     height: 41,
@@ -140,4 +252,3 @@ const styles = StyleSheet.create({
     backgroundColor: 0,
   },
 });
-
