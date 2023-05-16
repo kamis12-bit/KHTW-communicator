@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import {getDatabase, get, ref, onValue, off, update, orderByChild, where, query} from 'firebase/database';
 import {
   Image,
   Pressable,
@@ -43,39 +44,151 @@ const mmlOptions = {
 };
 
 
-export default function ChatScreen() {
+export default function ChatScreen({route}) {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
+  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
+  const [myData, setMyData] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const customtInputToolbar = (props) => (
-    <InputToolbar
-      {...props}
-      containerStyle={{
-        backgroundColor: "white",
-      }}
-    />
-  ); 
-  
+  console.log("here");
+  console.log(firstUser, secondUser, chatroomId);
+
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "<p>Hello developer, check out this equation: $ \\frac{(n^2+n)(2n+1)}{6}$  </p>",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: require("../assets/cat.jpg"),
-        },
-      },
-    ]);
-  }, []);
+    console.log("here");
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
-  }, []);
+    //load old messages
+    const loadData = async () => {
+
+        const myChatroom = await fetchMessages();
+
+        const user1 = await findUser(firstUser);
+        const user2 = await findUser(secondUser);
+
+        setMyData(user1);
+        setSelectedUser(user2);
+    
+        setMessages(renderMessages(myChatroom.messages));
+
+    };
+          console.log("here");
+
+    loadData();
+  
+      // set chatroom change listener
+      const database = getDatabase();
+      const chatroomRef = ref(database, `chatrooms/${chatroomId}`);
+      onValue(chatroomRef, snapshot => {
+        const data = snapshot.val();
+        setMessages(renderMessages(data.messages));
+      });
+  
+      return () => {
+        //remove chatroom listener
+        off(chatroomRef);
+
+      };
+    }, []);
+
+    const findUser = async name => {
+
+        const database = getDatabase();
+    
+        const mySnapshot = await get(ref(database, `users/${name}`));
+    
+        return mySnapshot.val();
+    };
+
+
+    const customtInputToolbar = (props) => (
+        <InputToolbar
+          {...props}
+          containerStyle={{
+            backgroundColor: "white",
+          }}
+        />
+      ); 
+    
+
+    const renderMessages = useCallback(
+         msgs => {
+          //structure for chat library:
+          // msg = {
+          //   _id: '',
+          //   user: {
+          //     avatar:'',
+          //     name: '',
+          //     _id: ''
+          //   }
+          // }
+
+          return msgs
+            ? msgs.reverse().map((msg, index) => ({
+                ...msg,
+                _id: index,
+                user: {
+                  _id:
+                    msg.sender === firstUser
+                      ? firstUser
+                      : secondUser,
+                  avatar:
+                    msg.sender === firstUser
+                      ? firstAvatar
+                      : secondAvatar,
+                  name:
+                    msg.sender === firstUser
+                    ? firstUser
+                    : secondUser,
+                },
+              }))
+            : [];
+        },
+        [],
+      );
+    
+      const fetchMessages = useCallback(async () => {
+        const database = getDatabase();
+    
+        const snapshot = await get(
+          ref(database, `chatrooms/${chatroomId}`),
+        );
+
+        const user1 = await findUser(firstUser);
+        const user2 = await findUser(secondUser);
+
+        setMyData(user1);
+        setSelectedUser(user2);
+    
+        return snapshot.val();
+      }, [chatroomId]);
+
+
+
+  const onSend = useCallback(
+    async (msg = []) => {
+      //send the msg[0] to the other user
+      const database = getDatabase();
+
+      //fetch fresh messages from server
+      const currentChatroom = await fetchMessages();
+
+      const lastMessages = currentChatroom.messages || [];
+
+      update(ref(database, `chatrooms/${chatroomId}`), {
+        messages: [
+          ...lastMessages,
+          {
+            text: msg[0].text,
+            sender: firstUser,
+            createdAt: new Date(),
+          },
+        ],
+      });
+
+      setMessages(prevMessages => GiftedChat.append(prevMessages, msg));
+    },
+    [fetchMessages, firstUser, chatroomId],
+  );
 
   function CustomMessage({ message }) {
     const { text, user } = message;
@@ -158,7 +271,9 @@ handleActionPress =() => {
     <>
       <Pressable
         onPress={() => {
-          navigation.replace("Home");
+            navigation.navigate("Home", {
+                username: firstUser
+            });
         }}
         style={styles.actionBar}
       >
@@ -166,12 +281,10 @@ handleActionPress =() => {
       </Pressable>
 
       <GiftedChat
-        renderInputToolbar={(props) => customtInputToolbar(props)}
         messages={messages}
-        onSend={(messages) => {
-          onSend(messages);
-        }}
-        user={{ _id: 1 }}
+        onSend={newMessage => onSend(newMessage)}
+        user={{ _id: firstUser }}
+        
        renderActions={() => renderActions()}
         renderMessageText={({ currentMessage }) => (
           <CustomMessage message={currentMessage} />

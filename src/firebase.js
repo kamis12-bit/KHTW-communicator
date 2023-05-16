@@ -13,6 +13,7 @@ import { getAuth } from "firebase/auth"
 const firebaseConfig = {
     apiKey: "AIzaSyDk2UJip47cwijaKAM7JKsloO-4OiUo3G8",
     authDomain: "khtw-communicator.firebaseapp.com",
+    databaseURL: "https://khtw-communicator-default-rtdb.firebaseio.com/",
     projectId: "khtw-communicator",
     storageBucket: "khtw-communicator.appspot.com",
     messagingSenderId: "620609946458",
