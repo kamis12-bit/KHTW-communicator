@@ -24,9 +24,7 @@ const LoginScreen = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                
-                //const username = user.email.replace(/\./g, '_');
-               
+                               
             }
         })
 
@@ -42,10 +40,10 @@ const LoginScreen = () => {
                 console.log("Registered with: ", user);
                 const user_id = user.uid;
                 const avatar = 'https://i.pravatar.cc/150?u=' + Date.now()
-                console.log(user_id);
 
                 const newUserObj = {
                     username: user_id,
+                    mail: email,
                     avatar: avatar,
                   };
                   const database = getDatabase();
@@ -53,6 +51,7 @@ const LoginScreen = () => {
                   setMyData(user_id);
                   navigation.navigate("Home", {
                     username: user_id,
+                    mail: email,
                     avatar: avatar
                 });
             })
@@ -66,9 +65,10 @@ const LoginScreen = () => {
                 console.log("Logged in with: ", user.email);
                 const user_id = user.uid;
                 setMyData(user_id);
-                console.log("iii", user_id);
                 navigation.navigate("Home", {
-                    username: user_id
+                    username: user_id,
+                    mail: user.mail,
+                    avatar: user.avatar
                 });
             })
             .catch(error => alert(error.message))

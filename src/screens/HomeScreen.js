@@ -24,8 +24,7 @@ const HomeScreen = ({route}) => {
     const [userToAdd, setUserToAdd] = useState(null);
     const [myData, setMyData] = useState(null);
     const navigation = useNavigation()
-    const { username, avatar } = route.params;
-    console.log("welcome", username);
+    const { username, mail, avatar } = route.params;
 
     
     useEffect(() => {
@@ -53,7 +52,7 @@ const HomeScreen = ({route}) => {
         return <Pressable onPress={()=> { navigation.navigate("Chat", { firstUser:username, firstAvatar: avatar, secondUser: item.username, secondAvatar: item.avatar, chatroomId: item.chatroomId });
         } } style = {styles.row}>
             <Image style={styles.avatar} source={{uri: item.avatar}}/>
-            <Text> {item.username} </Text>
+            <Text> {item.mail} </Text>
         </Pressable>
     };
 
@@ -72,14 +71,12 @@ const HomeScreen = ({route}) => {
             const me = await findUser(username);            
             setMyData(me);
             const user = await findUser(name);
-            console.log("add", name, user);
 
             if (user) {
                 if (user.username == me.username) {
-                    //console.log("git");
                     return;
                 }
-                // sprawdzenie czy juz nie dodalismy 
+                // todo sprawdzenie czy juz nie dodalismy 
                 const newChatroomRef = push(ref(database, 'chatrooms'), {
                     firstUser: me.username,
                     secondUser: user.username,
@@ -95,6 +92,7 @@ const HomeScreen = ({route}) => {
                       ...userFriends,
                       {
                         username: me.username,
+                        mail: me.mail,
                         avatar: me.avatar,
                         chatroomId: newChatroomId,
                       },
@@ -108,6 +106,7 @@ const HomeScreen = ({route}) => {
                       ...myFriends,
                       {
                         username: user.username,
+                        mail: user.mail,
                         avatar: user.avatar,
                         chatroomId: newChatroomId,
                       },

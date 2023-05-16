@@ -51,11 +51,8 @@ export default function ChatScreen({route}) {
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  console.log("here");
-  console.log(firstUser, secondUser, chatroomId);
 
   useEffect(() => {
-    console.log("here");
 
     //load old messages
     const loadData = async () => {
@@ -71,7 +68,6 @@ export default function ChatScreen({route}) {
         setMessages(renderMessages(myChatroom.messages));
 
     };
-          console.log("here");
 
     loadData();
   
