@@ -11,11 +11,14 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  SafeAreaView
 
 } from "react-native";
 import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
+
+
 
 // options for MathJax
 const mmlOptions = {
@@ -42,10 +45,6 @@ const mmlOptions = {
     ],
   },
 };
-import React, { useCallback, useEffect, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, SafeAreaView } from "react-native";
-import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
-import { useNavigation } from "@react-navigation/core";
 
 
 export default function ChatScreen({route}) {
@@ -244,7 +243,8 @@ handleActionPress =() => {
     return (
       <Pressable
         onPress={() => {
-          navigation.replace("LaTeX");
+          navigation.navigate("LaTeX", 
+          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId });
         }}
         style={styles.latexButton}
       >

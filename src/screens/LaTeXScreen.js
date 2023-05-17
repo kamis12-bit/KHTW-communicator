@@ -12,9 +12,10 @@ import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
 
-const LaTeXScreen = () => {
+const LaTeXScreen = ({route}) => {
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
+  const {firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
 
   const appendText = (text) => {
     setMessage(message + " " + text);
@@ -45,7 +46,8 @@ const LaTeXScreen = () => {
         <Pressable
           style={styles.backButton}
           onPress={() => {
-            navigation.navigate("Chat", { latex: message });
+            navigation.navigate("Chat", 
+            {latex: message, firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId });
           }}
         >
           <Text>Back to chat with message</Text>
