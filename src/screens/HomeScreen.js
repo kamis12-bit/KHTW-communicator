@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, FlatList, Pressable, Image, TextInput, Button} from 'react-native'
-import { auth } from '../firebase'
+import { auth, findUserByMail } from '../firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/core'
 import React, {useEffect, useState } from "react";
+
 import {
     getDatabase,
     get,
@@ -11,6 +12,8 @@ import {
     onValue,
     push,
     update,
+    orderByChild,
+    getReference
   } from 'firebase/database';
 
 const defaultUsers = [
@@ -64,13 +67,28 @@ const HomeScreen = ({route}) => {
         return mySnapshot.val();
       };
 
+      const getUserByEmail = async mail => {
+
+        const users = await findUserByMail(mail);
+        if (users.length === 0) {
+            console.log("no user with this email");
+            return null;
+        } else {
+            return users[0];
+        }
+    
+
+    };
+
+
     const onAddFriend = async name => {
         try {
 
             const database = getDatabase();
             const me = await findUser(username);            
             setMyData(me);
-            const user = await findUser(name);
+            //const user = await findUser(name);
+            const user = await getUserByEmail(name);
 
             if (user) {
                 if (user.username == me.username) {

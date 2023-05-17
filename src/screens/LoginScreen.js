@@ -37,7 +37,7 @@ const LoginScreen = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(userCredentials => {
                 const user = userCredentials.user;
-                console.log("Registered with: ", user);
+                console.log("Registered with: ", user.email);
                 const user_id = user.uid;
                 const avatar = 'https://i.pravatar.cc/150?u=' + Date.now()
 
