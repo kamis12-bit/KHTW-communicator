@@ -51,8 +51,7 @@ export default function ChatScreen({route}) {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
   const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
-  const [text, setText] = useState(latex);
-  console.log("mess", latex, text);
+  const [text, setText] = useState("");
 
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -62,7 +61,10 @@ export default function ChatScreen({route}) {
     //load old messages
     const loadData = async () => {
 
-        setText(latex);
+
+        setText(latex);  
+        console.log("mess", latex, text);
+
         const myChatroom = await fetchMessages();
 
         const user1 = await findUser(firstUser);
@@ -245,7 +247,7 @@ handleActionPress =() => {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate("LaTeX", 
+          navigation.replace("LaTeX", 
           { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId });
         }}
         style={styles.latexButton}

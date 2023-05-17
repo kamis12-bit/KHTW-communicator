@@ -16,11 +16,6 @@ import {
     getReference
   } from 'firebase/database';
 
-const defaultUsers = [
-  { id: 1, name: "Alex", avatar: require("../assets/cat.jpg") },
-  { id: 2, name: "Sara", avatar: require("../assets/cat1.jpeg") },
-  { id: 3, name: "Max", avatar: require("../assets/cat2.jpeg") },
-];
 
 const HomeScreen = ({route}) => {
     const [users, setUsers] = useState([]);
