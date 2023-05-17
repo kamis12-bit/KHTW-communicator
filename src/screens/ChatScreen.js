@@ -6,7 +6,10 @@ import { useNavigation } from "@react-navigation/core";
 export default function ChatScreen({ route }) {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
- 
+
+  const { latex } = route.params;
+  const [text, setText] = useState(latex);
+
   const customtInputToolbar = (props) => {
     return (
       <InputToolbar
@@ -43,31 +46,33 @@ export default function ChatScreen({ route }) {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate("LaTeX");
+          navigation.replace("LaTeX");
         }}
         style={styles.latexButton}
-      ><Text>
-        LaTeX
-        </Text>
+      >
+        <Text>LaTeX</Text>
       </Pressable>
     );
   };
 
   return (
     <>
-      <Text>{JSON.stringify(latex)}</Text>
+      <Text>{latex}</Text>
       <Pressable
         onPress={() => {
           navigation.replace("Home");
         }}
         style={styles.actionBar}
-      >
-      </Pressable>
+      ></Pressable>
 
       <GiftedChat
         renderInputToolbar={(props) => customtInputToolbar(props)}
         messages={messages}
         onSend={(messages) => onSend(messages)}
+        initialText={text}
+        onInputTextChanged={(text) => {
+          setText(text);
+        }}
         user={{
           _id: 1,
         }}
@@ -87,7 +92,6 @@ const styles = StyleSheet.create({
   },
 
   latexButton: {
-    // backgroundColor: '#880000',
-    height: "200%",
+    height: "100%",
   },
 });
