@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   textarea_wrapper: {
     height: "70%",
-    justifyContent: "flex-end",
+    //justifyContent: "flex-end",
   },
 
   input: {

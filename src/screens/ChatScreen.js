@@ -269,6 +269,10 @@ handleActionPress =() => {
       <GiftedChat
         messages={messages}
         onSend={newMessage => onSend(newMessage)}
+        initialText={text}
+        onInputTextChanged={(text) => {
+          setText(text);
+        }}
         user={{ _id: firstUser }}
         
        renderActions={() => renderActions()}
