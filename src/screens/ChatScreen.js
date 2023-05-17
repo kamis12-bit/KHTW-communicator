@@ -52,16 +52,17 @@ export default function ChatScreen({route}) {
   const navigation = useNavigation();
   const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
   const [text, setText] = useState(latex);
+  console.log("mess", latex, text);
 
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-  console.log("mess", text);
 
   useEffect(() => {
 
     //load old messages
     const loadData = async () => {
 
+        setText(latex);
         const myChatroom = await fetchMessages();
 
         const user1 = await findUser(firstUser);
@@ -268,8 +269,9 @@ handleActionPress =() => {
       </Pressable>
 
       <GiftedChat
+        renderInputToolbar={(props) => customtInputToolbar(props)}
         messages={messages}
-        onSend={newMessage => onSend(newMessage)}
+        onSend={messages => onSend(messages)}
         initialText={text}
         onInputTextChanged={(text) => {
           setText(text);
