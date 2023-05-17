@@ -1,17 +1,3 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  SafeAreaView,
-  FlatList,
-  Pressable,
-  Image,
-} from "react-native";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
-import { useNavigation } from "@react-navigation/core";
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, FlatList, Pressable, Image, TextInput, Button} from 'react-native'
 import { auth, findUserByMail } from '../firebase'
 import { signOut } from 'firebase/auth'
