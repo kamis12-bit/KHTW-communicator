@@ -52,7 +52,7 @@ const HomeScreen = ({route}) => {
   };
 
     const renderUser=({item}) => {
-        return <Pressable onPress={()=> { navigation.navigate("Chat", { latex: "e", firstUser:username, firstAvatar: avatar, secondUser: item.username, secondAvatar: item.avatar, chatroomId: item.chatroomId });
+        return <Pressable onPress={()=> { navigation.navigate("Chat", { firstUser:username, firstAvatar: avatar, secondUser: item.username, secondAvatar: item.avatar, chatroomId: item.chatroomId, latex: "" });
         } } style = {styles.row}>
             <Image style={styles.avatar} source={{uri: item.avatar}}/>
             <Text> {item.mail} </Text>

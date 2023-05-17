@@ -50,11 +50,12 @@ const mmlOptions = {
 export default function ChatScreen({route}) {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  const { latex, firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
-  const [myData, setMyData] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
   const [text, setText] = useState(latex);
 
+  const [myData, setMyData] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  console.log("mess", text);
 
   useEffect(() => {
 

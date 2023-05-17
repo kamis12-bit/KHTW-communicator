@@ -47,7 +47,7 @@ const LaTeXScreen = ({route}) => {
           style={styles.backButton}
           onPress={() => {
             navigation.navigate("Chat", 
-            {latex: message, firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId });
+            {firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: message });
           }}
         >
           <Text>Back to chat with message</Text>
@@ -61,7 +61,7 @@ const LaTeXScreen = ({route}) => {
             value={message}
             onChangeText={(text) => {
               setMessage(text);
-              console.log(text);
+              //console.log(text);
             }}
             placeholder="useless placeholder"
           />
