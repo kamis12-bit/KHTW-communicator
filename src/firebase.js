@@ -4,7 +4,7 @@
 // import * as firebase from "firebase/compact";
 import firebase from "firebase/compat/app";
 import { getAuth } from "firebase/auth"
-//import 'firebase/auth';
+import 'firebase/compat/database';//import 'firebase/auth';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -13,6 +13,7 @@ import { getAuth } from "firebase/auth"
 const firebaseConfig = {
     apiKey: "AIzaSyDk2UJip47cwijaKAM7JKsloO-4OiUo3G8",
     authDomain: "khtw-communicator.firebaseapp.com",
+    databaseURL: "https://khtw-communicator-default-rtdb.firebaseio.com/",
     projectId: "khtw-communicator",
     storageBucket: "khtw-communicator.appspot.com",
     messagingSenderId: "620609946458",
@@ -26,8 +27,22 @@ const firebaseConfig = {
 // } else {
 //     app = firebase.app();
 // }
+
 const app = firebase.initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
-export { auth };
+const database = firebase.database();
+
+const findUserByMail = async name => {
+    const ref = database.ref("users");
+    var query = ref.orderByChild("mail").equalTo(name);
+    const snapshot = await query.once("value");
+    const users = [];
+    snapshot.forEach(function(child) {
+        users.push(child.val());
+    });
+    return users;
+};
+
+export { auth, findUserByMail };

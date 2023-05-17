@@ -4,28 +4,56 @@ import { KeyboardAvoidingView, TextInput, TouchableOpacity } from 'react-native'
 import { auth } from '../firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/core'
+import {
+    getDatabase,
+    get,
+    ref,
+    set,
+    onValue,
+    push,
+    update,
+  } from 'firebase/database';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [myData, setMyData] = useState(null);
 
     const navigation = useNavigation()
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                navigation.replace("Home")
+                               
             }
         })
 
         return unsubscribe
     }, [])
 
+
+
     const handleSignup = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(userCredentials => {
                 const user = userCredentials.user;
                 console.log("Registered with: ", user.email);
+                const user_id = user.uid;
+                const avatar = 'https://i.pravatar.cc/150?u=' + Date.now()
+
+                const newUserObj = {
+                    username: user_id,
+                    mail: email,
+                    avatar: avatar,
+                  };
+                  const database = getDatabase();
+                  set(ref(database, `users/${user_id}`), newUserObj);
+                  setMyData(user_id);
+                  navigation.navigate("Home", {
+                    username: user_id,
+                    mail: email,
+                    avatar: avatar
+                });
             })
             .catch(error => alert(error.message))
     }
@@ -35,6 +63,13 @@ const LoginScreen = () => {
             .then(userCredentials => {
                 const user = userCredentials.user;
                 console.log("Logged in with: ", user.email);
+                const user_id = user.uid;
+                setMyData(user_id);
+                navigation.navigate("Home", {
+                    username: user_id,
+                    mail: user.mail,
+                    avatar: user.avatar
+                });
             })
             .catch(error => alert(error.message))
 
