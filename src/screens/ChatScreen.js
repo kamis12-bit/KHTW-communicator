@@ -42,14 +42,19 @@ const mmlOptions = {
     ],
   },
 };
+import React, { useCallback, useEffect, useState } from "react";
+import { Image, Pressable, StyleSheet, Text, SafeAreaView } from "react-native";
+import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
+import { useNavigation } from "@react-navigation/core";
 
 
 export default function ChatScreen({route}) {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
+  const { latex, firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [text, setText] = useState(latex);
 
 
   useEffect(() => {
@@ -235,33 +240,18 @@ handleActionPress =() => {
 
   };
   
-  const renderActions =  (props) => {
+  const renderActions = (props) => {
     return (
-    <Actions
-            {...props}
-            options={{
-                ['Document']: async (props) => {
-                    try {
-                        const result = await DocumentPicker.pick({
-                            type: [DocumentPicker.types.pdf],
-                        });
-                       console.log("image file",result)
-                    } catch (e) {
-                        if (DocumentPicker.isCancel(e)) {
-                            console.log("User cancelled!")
-                        } else {
-                            throw e;
-                        }
-                    }
-
-                },
-                Cancel: (props) => { console.log("Cancel") }
-            }}
-            onSend={args => console.log(args)}
-        />
+      <Pressable
+        onPress={() => {
+          navigation.replace("LaTeX");
+        }}
+        style={styles.latexButton}
+      >
+        <Text>LaTeX</Text>
+      </Pressable>
     );
   };
-
 
   return (
     <>
@@ -359,5 +349,10 @@ container: {
 
     fontSize: 10,
     backgroundColor: 0,
+  },
+
+
+  latexButton: {
+    height: "100%",
   },
 });
