@@ -249,7 +249,7 @@ handleActionPress =() => {
       <Pressable
         onPress={() => {
           navigation.replace("LaTeX", 
-          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: lastMess });
+          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: text });
         }}
         style={styles.latexButton}
       >

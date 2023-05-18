@@ -36,8 +36,9 @@ const formulas_pool = [
 
 const LaTeXScreen = ({ route }) => {
   const navigation = useNavigation();
-  const [message, setMessage] = useState("");
   const {  firstUser, firstAvatar, secondUser, secondAvatar, chatroomId , latex } = route.params;
+  const [message, setMessage] = useState(latex);
+
   const [find, setFind] = useState("")
   const [formulas, setFormulas] = useState(formulas_pool)  
   console.log(latex);
@@ -45,6 +46,9 @@ const LaTeXScreen = ({ route }) => {
   const appendText = (text) => {
     setMessage(message + " " + text);
   };
+
+
+  
 
   const filterFormulas = () => {
     if(find == "") {
@@ -176,14 +180,6 @@ const LaTeXScreen = ({ route }) => {
             />
           </View>
 
-           <Pressable
-          style={styles.latexButton}
-          onPress={() => {
-            appendText(latex);
-          }}
-        >
-          <Text>Paste my last message</Text>
-        </Pressable>
 
           <View style={styles.back_button_wrapper}>
             <Pressable
