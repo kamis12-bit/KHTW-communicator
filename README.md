@@ -11,3 +11,5 @@ You might need to install:
 "npm install --save react-native-gifted-chat"
 
 "npm install react-native-mathjax"
+
+"npm install react-native-webview"
