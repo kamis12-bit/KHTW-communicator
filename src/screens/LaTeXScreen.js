@@ -15,7 +15,8 @@ import MathJax from "react-native-mathjax";
 const LaTeXScreen = ({route}) => {
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
-  const {firstUser, firstAvatar, secondUser, secondAvatar, chatroomId} = route.params;
+  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
+  console.log(latex);
 
   const appendText = (text) => {
     setMessage(message + " " + text);
@@ -42,6 +43,16 @@ const LaTeXScreen = ({route}) => {
         >
           <Text>Integral</Text>
         </Pressable>
+
+        <Pressable
+          style={styles.latexButton}
+          onPress={() => {
+            appendText(latex);
+          }}
+        >
+          <Text>Paste my last message</Text>
+        </Pressable>
+
 
         <Pressable
           style={styles.backButton}

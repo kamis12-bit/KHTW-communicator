@@ -52,7 +52,7 @@ export default function ChatScreen({route}) {
   const navigation = useNavigation();
   const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
   const [text, setText] = useState("");
-
+  const [lastMess, setLastMess] = useState("");
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -188,7 +188,8 @@ export default function ChatScreen({route}) {
           },
         ],
       });
-
+      setLastMess(msg[0].text);
+      console.log("last mess", msg[0].text, lastMess);
       setMessages(prevMessages => GiftedChat.append(prevMessages, msg));
     },
     [fetchMessages, firstUser, chatroomId],
@@ -248,7 +249,7 @@ handleActionPress =() => {
       <Pressable
         onPress={() => {
           navigation.replace("LaTeX", 
-          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId });
+          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: lastMess });
         }}
         style={styles.latexButton}
       >
