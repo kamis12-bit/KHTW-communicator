@@ -214,6 +214,17 @@ export default function ChatScreen({route}) {
   'Quadratic formula: x = (-b ± sqrt(b² - 4ac)) / 2a',
   'Sum of angles in a triangle: 180°',
   'Area of a circle: A = πr²',
+  { title: 'integral', formula: '\\int_{a}^{b}' },
+  { title: 'sum', formula: '\\sum_{a}^{b}'},
+  { title: 'product', formula: '\\prod_{a}^{b}'},
+  { title: 'divide', formula: '\\frag{a}{b}'},
+  { title: 'root', formula: '\\sqrt{a}'},
+  { title: 'ge', formula: '\\geq'},
+  { title: 'le', formula: '\\leq'}, 
+  { title: 'epsilon', formula: '\\varepsilon'},
+  { title: 'nthroot', formula: '\\sqrt[b]{a}'},
+  { title: 'dbtilde', formula: '\\thickapprox'},
+  { title: 'exp', formula: '\\e^{a}'},
   // add more formulas as needed
 ];
     return (
