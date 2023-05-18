@@ -264,7 +264,7 @@ handleActionPress =() => {
         }}
         style={styles.latexButton}
       >
-        <Text>LaTeX</Text>
+        <Text style={styles.latexbtn}>LaTeX</Text>
       </Pressable>
     );
   };
@@ -371,9 +371,15 @@ container: {
     fontSize: 10,
     backgroundColor: 0,
   },
-
-
+  latexbtn: {
+    fontSize: 16,
+    paddingTop: 5,
+  },
   latexButton: {
-    height: "100%",
+    borderRadius: 3,
+    backgroundColor: '#cacaca',
+    paddingLeft: 10,
+    paddingRight: 5,
+    height: 50,
   },
 });
