@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     input: {
+        borderRadius: 10,
         backgroundColor: '#cacaca',
         flex: 1,
         marginRight: 10,

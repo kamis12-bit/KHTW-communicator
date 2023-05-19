@@ -12,13 +12,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   SafeAreaView
-
 } from "react-native";
 import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
-
-
 
 // options for MathJax
 const mmlOptions = {
@@ -52,7 +49,7 @@ export default function ChatScreen({route}) {
   const navigation = useNavigation();
   const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
   const [text, setText] = useState("");
-  const [lastMess, setLastMess] = useState("");
+
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -188,8 +185,7 @@ export default function ChatScreen({route}) {
           },
         ],
       });
-      setLastMess(msg[0].text);
-      console.log("last mess", msg[0].text, lastMess);
+
       setMessages(prevMessages => GiftedChat.append(prevMessages, msg));
     },
     [fetchMessages, firstUser, chatroomId],
@@ -253,7 +249,7 @@ handleActionPress =() => {
         }}
         style={styles.latexButton}
       >
-        <Text>LaTeX</Text>
+        <Text style={styles.latexbtn}>LaTeX</Text>
       </Pressable>
     );
   };
@@ -360,8 +356,16 @@ container: {
     fontSize: 10,
     backgroundColor: 0,
   },
-
-
+  latexbtn: {
+    borderRadius: 10,
+    height: 50,
+    backgroundColor: '#cacaca',
+    fontSize: 14,
+    paddingBottom: 5,
+    paddingTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
   latexButton: {
     height: "100%",
   },
