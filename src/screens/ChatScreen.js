@@ -12,13 +12,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   SafeAreaView
-
 } from "react-native";
 import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
-
-
 
 // options for MathJax
 const mmlOptions = {
@@ -52,7 +49,7 @@ export default function ChatScreen({route}) {
   const navigation = useNavigation();
   const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
   const [text, setText] = useState("");
-  const [lastMess, setLastMess] = useState("");
+
   const [myData, setMyData] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -188,8 +185,7 @@ export default function ChatScreen({route}) {
           },
         ],
       });
-      setLastMess(msg[0].text);
-      console.log("last mess", msg[0].text, lastMess);
+
       setMessages(prevMessages => GiftedChat.append(prevMessages, msg));
     },
     [fetchMessages, firstUser, chatroomId],
@@ -214,17 +210,6 @@ export default function ChatScreen({route}) {
   'Quadratic formula: x = (-b ± sqrt(b² - 4ac)) / 2a',
   'Sum of angles in a triangle: 180°',
   'Area of a circle: A = πr²',
-  { title: 'integral', formula: '\\int_{a}^{b}' },
-  { title: 'sum', formula: '\\sum_{a}^{b}'},
-  { title: 'product', formula: '\\prod_{a}^{b}'},
-  { title: 'divide', formula: '\\frag{a}{b}'},
-  { title: 'root', formula: '\\sqrt{a}'},
-  { title: 'ge', formula: '\\geq'},
-  { title: 'le', formula: '\\leq'}, 
-  { title: 'epsilon', formula: '\\varepsilon'},
-  { title: 'nthroot', formula: '\\sqrt[b]{a}'},
-  { title: 'dbtilde', formula: '\\thickapprox'},
-  { title: 'exp', formula: '\\e^{a}'},
   // add more formulas as needed
 ];
     return (
@@ -260,7 +245,7 @@ handleActionPress =() => {
       <Pressable
         onPress={() => {
           navigation.replace("LaTeX", 
-          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: lastMess });
+          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: text });
         }}
         style={styles.latexButton}
       >
@@ -372,14 +357,16 @@ container: {
     backgroundColor: 0,
   },
   latexbtn: {
-    fontSize: 16,
+    borderRadius: 10,
+    height: 50,
+    backgroundColor: '#cacaca',
+    fontSize: 14,
+    paddingBottom: 5,
     paddingTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   latexButton: {
-    borderRadius: 3,
-    backgroundColor: '#cacaca',
-    paddingLeft: 10,
-    paddingRight: 5,
-    height: 50,
+    height: "100%",
   },
 });
