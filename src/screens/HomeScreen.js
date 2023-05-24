@@ -83,7 +83,8 @@ const HomeScreen = ({route}) => {
             const me = await findUser(username);            
             setMyData(me);
             //const user = await findUser(name);
-            const user = await getUserByEmail(name);
+            const namee = name.toLowerCase()
+            const user = await getUserByEmail(namee);
 
             if (user) {
                 if (user.username == me.username) {
