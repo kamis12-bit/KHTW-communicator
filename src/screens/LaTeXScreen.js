@@ -14,17 +14,17 @@ import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
 
 const formulas_pool = [
-  { title: 'Integral', formula: '\\int_{a}^{b}' },
-  { title: 'Sum', formula: '\\sum_{a}^{b}'},
-  { title: 'Product', formula: '\\prod_{a}^{b}'},
-  { title: 'Divide', formula: '\\cfrac{a}{b}'},
-  { title: 'Root', formula: '\\sqrt{a}'},
-  { title: 'Greater equal', formula: '\\geq'},
-  { title: 'Less equal', formula: '\\leq'}, 
-  { title: 'Epsilon', formula: '\\varepsilon'},
-  { title: 'N-thRoot', formula: '\\sqrt[b]{a}'},
-  { title: 'Dbtilde', formula: '\\thickapprox'},
-  { title: 'Exponent', formula: 'e^{a}'},
+  { title: 'Integral', formula: '\\int_{a}^{b}', weight:'1'},
+  { title: 'Sum', formula: '\\sum_{a}^{b}', weight:'1'},
+  { title: 'Product', formula: '\\prod_{a}^{b}', weight:'1'},
+  { title: 'Divide', formula: '\\cfrac{a}{b}', weight:'1'},
+  { title: 'Root', formula: '\\sqrt{a}', weight:'1'},
+  { title: 'Greater equal', formula: '\\geq', weight:'1'},
+  { title: 'Less equal', formula: '\\leq', weight:'1'}, 
+  { title: 'Epsilon', formula: '\\varepsilon', weight:'1'},
+  { title: 'N-thRoot', formula: '\\sqrt[b]{a}', weight:'1'},
+  { title: 'Dbtilde', formula: '\\thickapprox', weight:'1'},
+  { title: 'Exponent', formula: 'e^{a}', weight:'1'},
 ]
 
 const LaTeXScreen = ({ route }) => {
@@ -49,16 +49,20 @@ const LaTeXScreen = ({ route }) => {
     for(var i = 0; i < formulas_pool.length; i++) {
       if(formulas_pool[i].title.includes(find)) {
         l.push(formulas_pool[i]);
+        formulas_pool[i].weight++;
       }
     }
     setFind("")
     setFormulas(l)
   }
 
-  const appendFormula = (formula) => { appendText('$' + formula + '$') }
+  const appendFormula = (item) => { 
+    appendText('$' + item.formula + '$');
+    item.weight++;
+  }
 
   const Item = ({ item }) => (
-    <Pressable onPress={ () => { appendFormula(item.formula) } }>
+    <Pressable onPress={ () => { appendFormula(item) } }>
       <View style={styles.list_item}>
         <Text style={styles.list_item_title}>{item.title}</Text>
       </View>
@@ -106,8 +110,8 @@ const LaTeXScreen = ({ route }) => {
 
           <View style={styles.list_bg}>
             <FlatList
-              data={formulas}
-              renderItem={({ item }) => <Item item={item} />}
+              data={formulas.sort((a, b) => b.weight.toString().localeCompare(a.weight))}
+              renderItem={({ item }) => <Item item={item} />} 
               keyExtractor={item => item.formula}
             />
           </View>
