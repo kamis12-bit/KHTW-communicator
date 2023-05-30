@@ -64,7 +64,11 @@ const LaTeXScreen = ({ route }) => {
   const Item = ({ item }) => (
     <Pressable onPress={ () => { appendFormula(item) } }>
       <View style={styles.list_item}>
-        <Text style={styles.list_item_title}>{item.title}</Text>
+        <MathJax
+          style={styles.list_item_title_1}
+          mathJaxOptions={mmlOptions}
+          html={item.title + ' ' + '$' + item.formula + '$'}
+        />
       </View>
     </Pressable>
   );
@@ -111,7 +115,18 @@ const LaTeXScreen = ({ route }) => {
           <View style={styles.list_bg}>
             <FlatList
               data={formulas.sort((a, b) => b.weight.toString().localeCompare(a.weight))}
-              renderItem={({ item }) => <Item item={item} />} 
+              renderItem={({ item }) => 
+                //<Item item={item} />
+                  <Pressable onPress={ () => { appendFormula(item) } }>
+                  <View style={styles.list_item}>
+                    <MathJax
+                      style={styles.list_item_title_1}
+                      mathJaxOptions={mmlOptions}
+                      html={item.title + ' ' + '$' + item.formula + '$'}
+                    />
+                  </View>
+                </Pressable>          
+              } 
               keyExtractor={item => item.formula}
             />
           </View>
@@ -216,7 +231,7 @@ const styles = StyleSheet.create({
   },
   list_item: {
     width: '100%',
-    height: 50,
+    height: 55,
     alignContent: 'center',
     textAlign: 'center',
     borderRadius: 15,
@@ -224,10 +239,17 @@ const styles = StyleSheet.create({
     padding: 5,
     borderWidth: 1,
   },
+  list_item_title_1: {
+    paddingBottom: 5,
+    fontWeight: 400,
+    fontSize: 17,
+    backgroundColor: 'transparent',
+    paddingLeft: 150,
+  },
   list_item_title: {
     alignSelf: 'center',
     fontWeight: 400,
-    paddingTop: 6,
+    paddingTop: 3,
     fontSize: 17,
   },
   formulas_search: {
