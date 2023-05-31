@@ -43,7 +43,7 @@ const LoginScreen = () => {
 
                 const newUserObj = {
                     username: user_id,
-                    mail: email,
+                    mail: user.email,
                     avatar: avatar,
                   };
                   const database = getDatabase();
@@ -51,7 +51,7 @@ const LoginScreen = () => {
                   setMyData(user_id);
                   navigation.navigate("Home", {
                     username: user_id,
-                    mail: email,
+                    mail: user.email,
                     avatar: avatar
                 });
             })
@@ -67,7 +67,7 @@ const LoginScreen = () => {
                 setMyData(user_id);
                 navigation.navigate("Home", {
                     username: user_id,
-                    mail: user.mail,
+                    mail: user.email,
                     avatar: user.avatar
                 });
             })
