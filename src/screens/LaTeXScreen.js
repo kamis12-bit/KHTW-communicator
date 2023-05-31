@@ -12,20 +12,13 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import MathJax from "react-native-mathjax";
+import { formulas_pool } from "./Formulas.js"
 
-const formulas_pool = [
-  { title: 'Integral', formula: '\\int_{a}^{b}', weight:'1'},
-  { title: 'Sum', formula: '\\sum_{a}^{b}', weight:'1'},
-  { title: 'Product', formula: '\\prod_{a}^{b}', weight:'1'},
-  { title: 'Divide', formula: '\\cfrac{a}{b}', weight:'1'},
-  { title: 'Root', formula: '\\sqrt{a}', weight:'1'},
-  { title: 'Greater equal', formula: '\\geq', weight:'1'},
-  { title: 'Less equal', formula: '\\leq', weight:'1'}, 
-  { title: 'Epsilon', formula: '\\varepsilon', weight:'1'},
-  { title: 'N-thRoot', formula: '\\sqrt[b]{a}', weight:'1'},
-  { title: 'Dbtilde', formula: '\\thickapprox', weight:'1'},
-  { title: 'Exponent', formula: 'e^{a}', weight:'1'},
-]
+// const formulas_pool = [
+
+// ]
+//
+//
 
 const LaTeXScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -39,15 +32,18 @@ const LaTeXScreen = ({ route }) => {
   };
 
   const filterFormulas = () => {
-    if(find == "") {
-      setFormulas(formulas_pool);
-      return;
-    }
-    let s = '/*' + find + '*$/';
-    let regex = new RegExp(s )
+    // if(find == "") {
+    //   setFormulas(formulas_pool)
+    //   return;
+    // }
+    // let s = '/*' + find + '*$/';
+    // let regex = new RegExp(s )
     var l = []
-    for(var i = 0; i < formulas_pool.length; i++) {
-      if(formulas_pool[i].title.includes(find)) {
+    var k = 30;
+    for(var i = 0; i < formulas_pool.length && k >= 0; i++) {
+      if(formulas_pool[i].title.toUpperCase().includes(find.toUpperCase()) || formulas_pool[i].formula.toUpperCase().includes(find.toUpperCase())
+      ) {
+        k--;
         l.push(formulas_pool[i]);
         formulas_pool[i].weight++;
       }
@@ -306,13 +302,17 @@ const mmlOptions = {
     processEscapes: true,
   },
   TeX: {
+    packages: {'[+]': ['tagformat']},
     extensions: [
       "AMSmath.js",
       "AMSsymbols.js",
       "noErrors.js",
       "noUndefined.js",
+
     ],
   },
 };
+
+
 
 export default LaTeXScreen;
