@@ -1,5 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {getDatabase, get, ref, onValue, off, update, orderByChild, where, query} from 'firebase/database';
+import React, { useCallback, useEffect, useState } from 'react'
+import {
+  getDatabase,
+  get,
+  ref,
+  onValue,
+  off,
+  update,
+  orderByChild,
+  where,
+  query,
+} from 'firebase/database'
 import {
   Image,
   Pressable,
@@ -11,169 +21,151 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  SafeAreaView
-} from "react-native";
-import { GiftedChat, InputToolbar, Actions } from "react-native-gifted-chat";
-import { useNavigation } from "@react-navigation/core";
-import MathJax from "react-native-mathjax";
+  SafeAreaView,
+} from 'react-native'
+import { GiftedChat, InputToolbar, Actions } from 'react-native-gifted-chat'
+import { useNavigation } from '@react-navigation/core'
+import MathJax from 'react-native-mathjax'
 
 // options for MathJax
 const mmlOptions = {
-  messageStyle: "none",
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: 'none',
+  extensions: ['tex2jax.js'],
+  jax: ['input/TeX', 'output/HTML-CSS'],
   tex2jax: {
     inlineMath: [
-      ["$", "$"],
-      ["\\(", "\\)"],
+      ['$', '$'],
+      ['\\(', '\\)'],
     ],
     displayMath: [
-      ["$$", "$$"],
-      ["\\[", "\\]"],
+      ['$$', '$$'],
+      ['\\[', '\\]'],
     ],
     processEscapes: true,
   },
   TeX: {
     extensions: [
-      "AMSmath.js",
-      "AMSsymbols.js",
-      "noErrors.js",
-      "noUndefined.js",
+      'AMSmath.js',
+      'AMSsymbols.js',
+      'noErrors.js',
+      'noUndefined.js',
     ],
   },
-};
+}
 
+export default function ChatScreen({ route }) {
+  const [messages, setMessages] = useState([])
+  const navigation = useNavigation()
+  const {
+    firstUser,
+    firstAvatar,
+    secondUser,
+    secondAvatar,
+    chatroomId,
+    latex,
+  } = route.params
+  const [text, setText] = useState('')
 
-export default function ChatScreen({route}) {
-  const [messages, setMessages] = useState([]);
-  const navigation = useNavigation();
-  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
-  const [text, setText] = useState("");
-
-  const [myData, setMyData] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [myData, setMyData] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null)
 
   useEffect(() => {
-
     //load old messages
     const loadData = async () => {
+      setText(latex)
+      console.log('mess', latex, text)
 
+      const myChatroom = await fetchMessages()
 
-        setText(latex);  
-        console.log("mess", latex, text);
+      const user1 = await findUser(firstUser)
+      const user2 = await findUser(secondUser)
 
-        const myChatroom = await fetchMessages();
+      setMyData(user1)
+      setSelectedUser(user2)
 
-        const user1 = await findUser(firstUser);
-        const user2 = await findUser(secondUser);
+      setMessages(renderMessages(myChatroom.messages))
+    }
 
-        setMyData(user1);
-        setSelectedUser(user2);
-    
-        setMessages(renderMessages(myChatroom.messages));
+    loadData()
 
-    };
+    // set chatroom change listener
+    const database = getDatabase()
+    const chatroomRef = ref(database, `chatrooms/${chatroomId}`)
+    onValue(chatroomRef, (snapshot) => {
+      const data = snapshot.val()
+      setMessages(renderMessages(data.messages))
+    })
 
-    loadData();
-  
-      // set chatroom change listener
-      const database = getDatabase();
-      const chatroomRef = ref(database, `chatrooms/${chatroomId}`);
-      onValue(chatroomRef, snapshot => {
-        const data = snapshot.val();
-        setMessages(renderMessages(data.messages));
-      });
-  
-      return () => {
-        //remove chatroom listener
-        off(chatroomRef);
+    return () => {
+      //remove chatroom listener
+      off(chatroomRef)
+    }
+  }, [])
 
-      };
-    }, []);
+  const findUser = async (name) => {
+    const database = getDatabase()
 
-    const findUser = async name => {
+    const mySnapshot = await get(ref(database, `users/${name}`))
 
-        const database = getDatabase();
-    
-        const mySnapshot = await get(ref(database, `users/${name}`));
-    
-        return mySnapshot.val();
-    };
+    return mySnapshot.val()
+  }
 
+  const customtInputToolbar = (props) => (
+    <InputToolbar
+      {...props}
+      containerStyle={{
+        backgroundColor: 'white',
+      }}
+    />
+  )
 
-    const customtInputToolbar = (props) => (
-        <InputToolbar
-          {...props}
-          containerStyle={{
-            backgroundColor: "white",
-          }}
-        />
-      ); 
-    
+  const renderMessages = useCallback((msgs) => {
+    //structure for chat library:
+    // msg = {
+    //   _id: '',
+    //   user: {
+    //     avatar:'',
+    //     name: '',
+    //     _id: ''
+    //   }
+    // }
 
-    const renderMessages = useCallback(
-         msgs => {
-          //structure for chat library:
-          // msg = {
-          //   _id: '',
-          //   user: {
-          //     avatar:'',
-          //     name: '',
-          //     _id: ''
-          //   }
-          // }
+    return msgs
+      ? msgs.reverse().map((msg, index) => ({
+          ...msg,
+          _id: index,
+          user: {
+            _id: msg.sender === firstUser ? firstUser : secondUser,
+            avatar: msg.sender === firstUser ? firstAvatar : secondAvatar,
+            name: msg.sender === firstUser ? firstUser : secondUser,
+          },
+        }))
+      : []
+  }, [])
 
-          return msgs
-            ? msgs.reverse().map((msg, index) => ({
-                ...msg,
-                _id: index,
-                user: {
-                  _id:
-                    msg.sender === firstUser
-                      ? firstUser
-                      : secondUser,
-                  avatar:
-                    msg.sender === firstUser
-                      ? firstAvatar
-                      : secondAvatar,
-                  name:
-                    msg.sender === firstUser
-                    ? firstUser
-                    : secondUser,
-                },
-              }))
-            : [];
-        },
-        [],
-      );
-    
-      const fetchMessages = useCallback(async () => {
-        const database = getDatabase();
-    
-        const snapshot = await get(
-          ref(database, `chatrooms/${chatroomId}`),
-        );
+  const fetchMessages = useCallback(async () => {
+    const database = getDatabase()
 
-        const user1 = await findUser(firstUser);
-        const user2 = await findUser(secondUser);
+    const snapshot = await get(ref(database, `chatrooms/${chatroomId}`))
 
-        setMyData(user1);
-        setSelectedUser(user2);
-    
-        return snapshot.val();
-      }, [chatroomId]);
+    const user1 = await findUser(firstUser)
+    const user2 = await findUser(secondUser)
 
+    setMyData(user1)
+    setSelectedUser(user2)
 
+    return snapshot.val()
+  }, [chatroomId])
 
   const onSend = useCallback(
     async (msg = []) => {
       //send the msg[0] to the other user
-      const database = getDatabase();
+      const database = getDatabase()
 
       //fetch fresh messages from server
-      const currentChatroom = await fetchMessages();
+      const currentChatroom = await fetchMessages()
 
-      const lastMessages = currentChatroom.messages || [];
+      const lastMessages = currentChatroom.messages || []
 
       update(ref(database, `chatrooms/${chatroomId}`), {
         messages: [
@@ -184,117 +176,119 @@ export default function ChatScreen({route}) {
             createdAt: new Date(),
           },
         ],
-      });
+      })
 
-      setMessages(prevMessages => GiftedChat.append(prevMessages, msg));
+      setMessages((prevMessages) => GiftedChat.append(prevMessages, msg))
     },
-    [fetchMessages, firstUser, chatroomId],
-  );
+    [fetchMessages, firstUser, chatroomId]
+  )
 
   function CustomMessage({ message }) {
-    const { text, user } = message;
+    const { text, user } = message
 
     return (
       <View style={styles.message}>
         {/* <Text> hi</Text> */}
         <MathJax style={styles.latex} mathJaxOptions={mmlOptions} html={text} />
       </View>
-    );
+    )
   }
 
-
-  
- const formluasWindow = () => {
+  const formulasWindow = () => {
     const formulas = [
-  'Pythagorean theorem: a² + b² = c²',
-  'Quadratic formula: x = (-b ± sqrt(b² - 4ac)) / 2a',
-  'Sum of angles in a triangle: 180°',
-  'Area of a circle: A = πr²',
-  // add more formulas as needed
-];
+      'Pythagorean theorem: a² + b² = c²',
+      'Quadratic formula: x = (-b ± sqrt(b² - 4ac)) / 2a',
+      'Sum of angles in a triangle: 180°',
+      'Area of a circle: A = πr²',
+      // add more formulas as needed
+    ]
     return (
-    <View style={styles.container}>
-      {formulas.map((formula, index) => (
-        <View key={index} style={styles.formulaContainer}>
-          <Text style={styles.formulaText}>{formula}</Text>
-        </View>
-      ))}
-    </View>
-  );
+      <View style={styles.container}>
+        {formulas.map((formula, index) => (
+          <View key={index} style={styles.formulaContainer}>
+            <Text style={styles.formulaText}>{formula}</Text>
+          </View>
+        ))}
+      </View>
+    )
   }
-  
-handleActionPress =() => {
-   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        height: 100,
-        padding: 20,
-      }}>
-      <View style={{backgroundColor: 'blue', flex: 0.3}} />
-      <View style={{backgroundColor: 'red', flex: 0.5}} />
-      <Text>Hello World!</Text>
-    </View>
-  );
-  
 
-  };
-  
+  handleActionPress = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          height: 100,
+          padding: 20,
+        }}
+      >
+        <View style={{ backgroundColor: 'blue', flex: 0.3 }} />
+        <View style={{ backgroundColor: 'red', flex: 0.5 }} />
+        <Text>Hello World!</Text>
+      </View>
+    )
+  }
+
   const renderActions = (props) => {
     return (
       <Pressable
         onPress={() => {
-          navigation.replace("LaTeX", 
-          { firstUser:firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: text });
+          navigation.replace('LaTeX', {
+            firstUser: firstUser,
+            firstAvatar: firstAvatar,
+            secondUser: secondUser,
+            secondAvatar: secondAvatar,
+            chatroomId: chatroomId,
+            latex: text,
+          })
         }}
         style={styles.latexButton}
       >
         <Text style={styles.latexbtn}>LaTeX</Text>
       </Pressable>
-    );
-  };
+    )
+  }
 
   return (
     <>
       <Pressable
         onPress={() => {
-            navigation.navigate("Home", {
-                username: firstUser
-            });
+          navigation.navigate('Home', {
+            username: firstUser,
+          })
         }}
         style={styles.actionBar}
       >
-        <Image source={require("../assets/back.png")} />
+        <Image source={require('../assets/back.png')} />
       </Pressable>
 
       <GiftedChat
         renderInputToolbar={(props) => customtInputToolbar(props)}
         messages={messages}
-        onSend={messages => onSend(messages)}
+        onSend={(messages) => onSend(messages)}
         initialText={text}
         onInputTextChanged={(text) => {
-          setText(text);
+          setText(text)
         }}
         user={{ _id: firstUser }}
-        
-       renderActions={() => renderActions()}
+        renderActions={() => renderActions()}
         renderMessageText={({ currentMessage }) => (
           <CustomMessage message={currentMessage} />
         )}
       />
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-formulas : {
-  height: 500,
+  formulas: {
+    height: 500,
     width: 500,
-    position: "absolute",
+    position: 'absolute',
     backgroundColor: 'powderblue',
-},
+  },
 
-container: {
+  container: {
     flex: 1,
     padding: 20,
   },
@@ -318,13 +312,12 @@ container: {
     color: '#000000',
   },
 
-
   actionBar: {
-    backgroundColor: "#cacaca",
+    backgroundColor: '#cacaca',
     height: 41,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   // container: {
   //   position:'relative',
@@ -346,8 +339,8 @@ container: {
     // marginBottom: 10,
     padding: 5,
     right: 15,
-    justifyContent: "flex-end",
-    alignSelf: "stretch",
+    justifyContent: 'flex-end',
+    alignSelf: 'stretch',
     marginLeft: 10,
   },
   latex: {
@@ -367,6 +360,6 @@ container: {
     paddingRight: 10,
   },
   latexButton: {
-    height: "100%",
+    height: '100%',
   },
-});
+})

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -9,10 +9,10 @@ import {
   TextInput,
   FlatList,
   KeyboardAvoidingView,
-} from "react-native";
-import { useNavigation } from "@react-navigation/core";
-import MathJax from "react-native-mathjax";
-import { formulas_pool } from "./Formulas.js"
+} from 'react-native';
+import { useNavigation } from '@react-navigation/core';
+import MathJax from 'react-native-mathjax';
+import { formulas_pool } from './Formulas.js';
 
 // const formulas_pool = [
 
@@ -22,13 +22,26 @@ import { formulas_pool } from "./Formulas.js"
 
 const LaTeXScreen = ({ route }) => {
   const navigation = useNavigation();
-  
-  const { firstUser, firstAvatar, secondUser, secondAvatar, chatroomId, latex } = route.params;
+
+  const {
+    firstUser,
+    firstAvatar,
+    secondUser,
+    secondAvatar,
+    chatroomId,
+    latex,
+  } = route.params;
   const [message, setMessage] = useState(latex);
-  const [find, setFind] = useState("")
-  const [formulas, setFormulas] = useState(formulas_pool)
-  const appendText = (text) => {
-    setMessage(message + " " + text);
+  const [find, setFind] = useState('');
+  const [formulas, setFormulas] = useState(formulas_pool);
+  const [position, setPosition] = useState(0);
+
+  const insertText = (text) => {
+    console.log(message, ' TEXT: ', text, ' POS: ', position);
+    const prefix = message.slice(0, position);
+    const suffix = message.slice(position, message.length);
+    setMessage(prefix + text + suffix);
+    setPosition(position + text.length);
   };
 
   const filterFormulas = () => {
@@ -38,27 +51,32 @@ const LaTeXScreen = ({ route }) => {
     // }
     // let s = '/*' + find + '*$/';
     // let regex = new RegExp(s )
-    var l = []
+    var l = [];
     var k = 30;
-    for(var i = 0; i < formulas_pool.length && k >= 0; i++) {
-      if(formulas_pool[i].title.toUpperCase().includes(find.toUpperCase()) || formulas_pool[i].formula.toUpperCase().includes(find.toUpperCase())
+    for (var i = 0; i < formulas_pool.length && k >= 0; i++) {
+      if (
+        formulas_pool[i].title.toUpperCase().includes(find.toUpperCase()) ||
+        formulas_pool[i].formula.toUpperCase().includes(find.toUpperCase())
       ) {
         k--;
         l.push(formulas_pool[i]);
         formulas_pool[i].weight++;
       }
     }
-    setFind("")
-    setFormulas(l)
-  }
+    setFind('');
+    setFormulas(l);
+  };
 
-  const appendFormula = (item) => { 
-    appendText('$' + item.formula + '$');
+  const appendFormula = (item) => {
+    insertText('$' + item.formula + '$');
     item.weight++;
-  }
+  };
 
   const Item = ({ item }) => (
-    <Pressable onPress={ () => { appendFormula(item) } }>
+    <Pressable
+      onPress={() => {
+        appendFormula(item);
+      }}>
       <View style={styles.list_item}>
         <MathJax
           style={styles.list_item_title_1}
@@ -89,31 +107,41 @@ const LaTeXScreen = ({ route }) => {
 
         <View style={styles.button_wrapper}>
           <View style={styles.formulas_search}>
-
             <View style={styles.find_wrapper}>
-                <TextInput
-                  style={styles.list_find_text}
-                  spellCheck={false}
-                  onChangeText={(text) => {setFind(text); console.log(find); }}
-                  value={find}
-                  placeholder="Find a formula"
-                />
+              <TextInput
+                style={styles.list_find_text}
+                spellCheck={false}
+                onChangeText={(text) => {
+                  setFind(text);
+                  console.log(find);
+                }}
+                value={find}
+                placeholder="Find a formula"
+              />
             </View>
 
-              <View style={styles.find_button_wrapper}>
-                  <Pressable style={styles.find_button} onPress={() => { filterFormulas(); }}>
-                    <Text style={styles.find_text}>Find</Text>
-                  </Pressable>
-              </View>
-
+            <View style={styles.find_button_wrapper}>
+              <Pressable
+                style={styles.find_button}
+                onPress={() => {
+                  filterFormulas();
+                }}>
+                <Text style={styles.find_text}>Find</Text>
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.list_bg}>
             <FlatList
-              data={formulas.sort((a, b) => b.weight.toString().localeCompare(a.weight))}
-              renderItem={({ item }) => 
+              data={formulas.sort((a, b) =>
+                b.weight.toString().localeCompare(a.weight)
+              )}
+              renderItem={({ item }) => (
                 //<Item item={item} />
-                  <Pressable onPress={ () => { appendFormula(item) } }>
+                <Pressable
+                  onPress={() => {
+                    appendFormula(item);
+                  }}>
                   <View style={styles.list_item}>
                     <MathJax
                       style={styles.list_item_title_1}
@@ -121,16 +149,14 @@ const LaTeXScreen = ({ route }) => {
                       html={item.title + ' ' + '$' + item.formula + '$'}
                     />
                   </View>
-                </Pressable>          
-              } 
-              keyExtractor={item => item.formula}
+                </Pressable>
+              )}
+              keyExtractor={(item) => item.formula}
             />
           </View>
-
         </View>
 
         <View style={styles.textarea_wrapper}>
-
           <View style={styles.input_toolbar_wrapper}>
             <TextInput
               multiline
@@ -138,7 +164,12 @@ const LaTeXScreen = ({ route }) => {
               style={styles.input}
               value={message}
               spellCheck={false}
-              onChangeText={(text) => { setMessage(text); }}
+              onSelectionChange={(event) =>
+                setPosition(event.nativeEvent.selection.end)
+              }
+              onChangeText={(text) => {
+                setMessage(text);
+              }}
               placeholder="Enter a message"
             />
           </View>
@@ -147,10 +178,16 @@ const LaTeXScreen = ({ route }) => {
             <Pressable
               style={styles.backButton}
               onPress={() => {
-                navigation.replace("Chat",
-                  { firstUser: firstUser, firstAvatar: firstAvatar, secondUser: secondUser, secondAvatar: secondAvatar, chatroomId: chatroomId, latex: message });
+                navigation.replace('Chat', {
+                  firstUser: firstUser,
+                  firstAvatar: firstAvatar,
+                  secondUser: secondUser,
+                  secondAvatar: secondAvatar,
+                  chatroomId: chatroomId,
+                  latex: message,
+                });
               }}>
-              <Text style={styles.back_text}>Back  To   Chat</Text>
+              <Text style={styles.back_text}>Back To Chat</Text>
             </Pressable>
           </View>
         </View>
@@ -161,25 +198,25 @@ const LaTeXScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   compiled_wrapper: {
     backgroundColor: 'white',
-    height: "30%",
+    height: '30%',
   },
   button_wrapper: {
-    height: "55%",
+    height: '55%',
   },
   input_toolbar_wrapper: {
-    width: "85%"
+    width: '85%',
   },
   back_button_wrapper: {
-    width: "15%",
-    alignSelf: "flex-end",
+    width: '15%',
+    alignSelf: 'flex-end',
   },
   compiled_text_wrapper: {
-    height: "100%",
+    height: '100%',
   },
   find_wrapper: {
     height: '100%',
@@ -191,9 +228,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   find_button_wrapper: {
-    height: "100%",
-    width: "15%",
-    alignSelf: "flex-end",
+    height: '100%',
+    width: '15%',
+    alignSelf: 'flex-end',
     position: 'absolute',
     backgroundColor: '#99cfe0',
     borderRadius: 4,
@@ -201,9 +238,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // Align items vertically in the middle
     alignItems: 'center', // Align items horizontally in the center
   },
-  find_button:{
+  find_button: {
     width: '100%',
-    height: '100%'
+    height: '100%',
   },
   find_text: {
     justifyContent: 'center',
@@ -214,16 +251,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   textarea_wrapper: {
-    width: "100%",
+    width: '100%',
     flex: 1,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
   },
   list_bg: {
     backgroundColor: '#2B768C',
-    flex: 1
+    flex: 1,
   },
   list_item: {
     width: '100%',
@@ -256,24 +293,24 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderWidth: 0.5,
     fontSize: 16,
   },
   latexButton: {
-    backgroundColor: "blue",
-    width: "60%",
+    backgroundColor: 'blue',
+    width: '60%',
     padding: 15,
     borderRadius: 5,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 40,
     bottom: 20,
   },
 
   backButton: {
-    height: "100%",
-    backgroundColor: "#99cfe0",
+    height: '100%',
+    backgroundColor: '#99cfe0',
     borderWidth: 0.5,
     borderRadius: 5,
   },
@@ -287,32 +324,29 @@ const styles = StyleSheet.create({
 });
 
 const mmlOptions = {
-  messageStyle: "none",
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX", "output/HTML-CSS"],
+  messageStyle: 'none',
+  extensions: ['tex2jax.js'],
+  jax: ['input/TeX', 'output/HTML-CSS'],
   tex2jax: {
     inlineMath: [
-      ["$", "$"],
-      ["\\(", "\\)"],
+      ['$', '$'],
+      ['\\(', '\\)'],
     ],
     displayMath: [
-      ["$$", "$$"],
-      ["\\[", "\\]"],
+      ['$$', '$$'],
+      ['\\[', '\\]'],
     ],
     processEscapes: true,
   },
   TeX: {
-    packages: {'[+]': ['tagformat']},
+    packages: { '[+]': ['tagformat'] },
     extensions: [
-      "AMSmath.js",
-      "AMSsymbols.js",
-      "noErrors.js",
-      "noUndefined.js",
-
+      'AMSmath.js',
+      'AMSsymbols.js',
+      'noErrors.js',
+      'noUndefined.js',
     ],
   },
 };
-
-
 
 export default LaTeXScreen;
