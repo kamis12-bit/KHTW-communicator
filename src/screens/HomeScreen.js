@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, FlatList, Pressable, Image, TextInput, Button} from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, FlatList, Pressable, Image, TextInput, Button, ScrollView} from 'react-native'
 import { auth, findUserByMail } from '../firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/core'
@@ -32,7 +32,7 @@ const HomeScreen = ({route}) => {
         const myUserRef = ref(database, `users/${username}`);
         onValue(myUserRef, snapshot => {
             const data = snapshot.val();
-            setUsers(data.friends);
+            setUsers(data.chats);
         });
     }, [])
 
@@ -47,10 +47,10 @@ const HomeScreen = ({route}) => {
   };
 
     const renderUser=({item}) => {
-        return <Pressable onPress={()=> { navigation.navigate("Chat", { firstUser:username, firstAvatar: avatar, secondUser: item.username, secondAvatar: item.avatar, chatroomId: item.chatroomId, latex: "" });
+        return <Pressable onPress={()=> { navigation.replace("Chat", { firstUser:username, firstAvatar: avatar, firstMail: mail, group: item.users, chatroomId: item.chatroomId, latex: "" });
         } } style = {styles.row}>
             <Image style={styles.avatar} source={{uri: item.avatar}}/>
-            <Text> {item.mail} </Text>
+            <Text> {item.name} </Text>
         </Pressable>
     };
 
@@ -62,70 +62,84 @@ const HomeScreen = ({route}) => {
         return mySnapshot.val();
       };
 
-      const getUserByEmail = async mail => {
+      const getUsersByEmail = async (mails) => {
+        const usersa = [];
+        for (let index = 0; index < mails.length; index++) {
+            const user = await findUserByMail(mails[index]);
+            if (user.length === 0) {
+                    console.log("no user with this email");
+            } else {
+                usersa.push(user[0]);
+            }
 
-        const users = await findUserByMail(mail);
-        if (users.length === 0) {
-            console.log("no user with this email");
-            return null;
-        } else {
-            return users[0];
         }
-    
+        return usersa;
 
     };
 
 
-    const onAddFriend = async name => {
+    const onAddFriend = async names => {
         try {
 
             const database = getDatabase();
             const me = await findUser(username);            
             setMyData(me);
             //const user = await findUser(name);
-            const namee = name.toLowerCase()
-            const user = await getUserByEmail(namee);
+            namesLoverCase = names.toLowerCase();
+            namesList = namesLoverCase.split(" ");
+            groupName = namesList[0];
+            namesList.shift();
+            namesList.push(mail);
+            const userss = await getUsersByEmail(namesList);
+            const userInfo = userss.map(user => {
+                const { username, mail, avatar } = user; // Specify the attributes you want to save
+                return {  username, mail, avatar }; // Create a new object with the desired attributes
+            });
 
-            if (user) {
-                if (user.username == me.username) {
-                    return;
-                }
-                // todo sprawdzenie czy juz nie dodalismy 
+            if (userss.length > 0) {
                 const newChatroomRef = push(ref(database, 'chatrooms'), {
-                    firstUser: me.username,
-                    secondUser: user.username,
+                    name:groupName,
+                    users:userInfo,
                     messages: [],
                   });
           
                   const newChatroomId = newChatroomRef.key;
-          
-                  const userFriends = user.friends || [];
+                  
+                
+                  
                   //join myself to this user friend list
-                  update(ref(database, `users/${user.username}`), {
-                    friends: [
-                      ...userFriends,
-                      {
-                        username: me.username,
-                        mail: me.mail,
-                        avatar: me.avatar,
-                        chatroomId: newChatroomId,
-                      },
-                    ],
-                  });
+
+                  for (let index = 0; index < userss.length; index++) {
+                    const thisUser = userss[index];
+                    const userFriends = thisUser.chats || [];
+                    update(ref(database, `users/${thisUser.username}`), {
+                                        chats: [
+                                        ...userFriends,
+                                        {
+                                            name:groupName,
+                                            avatar: 'https://picsum.photos/200/300?random='+Date.now(),
+                                            chatroomId: newChatroomId,
+                                            users: userInfo,
+                                        },
+                                        ],
+                                    });
+
+                  }
+                  
           
-                  const myFriends = users || [];
+                  //const myFriends = me.chats || [];
                   //add this user to my friend list
-                  update(ref(database, `users/${me.username}`), {
-                    friends: [
-                      ...myFriends,
-                      {
-                        username: user.username,
-                        mail: user.mail,
-                        avatar: user.avatar,
-                        chatroomId: newChatroomId,
-                      },
-                    ],
-                  });
+                  //update(ref(database, `users/${me.username}`), {
+                   // friends: [
+                    //  ...myFriends,
+                    //  {
+                    //    name:"groupchat",
+                    //    avatar: me.avatar,
+                    //    chatroomId: newChatroomId,
+                    //    users: userss,
+                    //  },
+                 //   ],
+                //  });
                 
             }
 
@@ -148,12 +162,10 @@ const HomeScreen = ({route}) => {
             <Button title={'Add User'} onPress={() => onAddFriend(userToAdd)} />
         </View>
         <View>
-         
             <FlatList
                 data={users}
                 renderItem={renderUser}
-                keyExtractor={item=>item.username.toString()} />
-        
+                keyExtractor={item=>item.chatroomId.toString()} />
         </View>
 
       <View style={styles.container}>

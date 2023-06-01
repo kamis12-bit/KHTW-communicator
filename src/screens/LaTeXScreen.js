@@ -26,8 +26,8 @@ const LaTeXScreen = ({ route }) => {
   const {
     firstUser,
     firstAvatar,
-    secondUser,
-    secondAvatar,
+    firstMail,
+    group,
     chatroomId,
     latex,
   } = route.params;
@@ -179,12 +179,12 @@ const LaTeXScreen = ({ route }) => {
               style={styles.backButton}
               onPress={() => {
                 navigation.replace('Chat', {
-                  firstUser: firstUser,
-                  firstAvatar: firstAvatar,
-                  secondUser: secondUser,
-                  secondAvatar: secondAvatar,
-                  chatroomId: chatroomId,
-                  latex: message,
+                    firstUser: firstUser,
+                    firstAvatar: firstAvatar,
+                    firstMail: firstMail,
+                    group: group,
+                    chatroomId: chatroomId,
+                    latex: message,
                 });
               }}>
               <Text style={styles.back_text}>Back To Chat</Text>

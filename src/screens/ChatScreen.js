@@ -58,16 +58,16 @@ export default function ChatScreen({ route }) {
   const navigation = useNavigation()
   const {
     firstUser,
-    firstAvatar,
-    secondUser,
-    secondAvatar,
+    firstMail,
+    group,
     chatroomId,
     latex,
   } = route.params
+  const firstAvatar = 'https://i.pravatar.cc/150?u=' + Date.now();
   const [text, setText] = useState('')
 
   const [myData, setMyData] = useState(null)
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedUsers, setSelectedUsers] = useState(null)
 
   useEffect(() => {
     //load old messages
@@ -76,12 +76,12 @@ export default function ChatScreen({ route }) {
       console.log('mess', latex, text)
 
       const myChatroom = await fetchMessages()
-
       const user1 = await findUser(firstUser)
-      const user2 = await findUser(secondUser)
 
+      const gr = myChatroom.users;
       setMyData(user1)
-      setSelectedUser(user2)
+    
+      setSelectedUsers(gr)
 
       setMessages(renderMessages(myChatroom.messages))
     }
@@ -110,6 +110,24 @@ export default function ChatScreen({ route }) {
     return mySnapshot.val()
   }
 
+  const fetchMessages = useCallback(async () => {
+    const database = getDatabase()
+
+    const snapshot = await get(ref(database, `chatrooms/${chatroomId}`))
+
+    const user1 = await findUser(firstUser)
+
+    setMyData(user1)
+
+    return snapshot.val()
+  }, [chatroomId])
+
+  const getSender =  (name) => {
+        const sender = group.find(item => item.username === name);
+        console.log("here", sender.avatar);
+        return sender;
+  }
+
   const customtInputToolbar = (props) => (
     <InputToolbar
       {...props}
@@ -120,42 +138,21 @@ export default function ChatScreen({ route }) {
   )
 
   const renderMessages = useCallback((msgs) => {
-    //structure for chat library:
-    // msg = {
-    //   _id: '',
-    //   user: {
-    //     avatar:'',
-    //     name: '',
-    //     _id: ''
-    //   }
-    // }
 
     return msgs
-      ? msgs.reverse().map((msg, index) => ({
+      ? msgs.reverse().map( (msg, index) => ({
           ...msg,
           _id: index,
           user: {
-            _id: msg.sender === firstUser ? firstUser : secondUser,
-            avatar: msg.sender === firstUser ? firstAvatar : secondAvatar,
-            name: msg.sender === firstUser ? firstUser : secondUser,
+            _id: msg.sender === firstUser ? firstUser : msg.sender,
+            avatar: msg.sender === firstUser ? "" : "",
+            name: msg.sender === firstMail ? firstUser : msg.mail,
           },
         }))
       : []
   }, [])
 
-  const fetchMessages = useCallback(async () => {
-    const database = getDatabase()
-
-    const snapshot = await get(ref(database, `chatrooms/${chatroomId}`))
-
-    const user1 = await findUser(firstUser)
-    const user2 = await findUser(secondUser)
-
-    setMyData(user1)
-    setSelectedUser(user2)
-
-    return snapshot.val()
-  }, [chatroomId])
+  
 
   const onSend = useCallback(
     async (msg = []) => {
@@ -174,6 +171,8 @@ export default function ChatScreen({ route }) {
             text: msg[0].text,
             sender: firstUser,
             createdAt: new Date(),
+            avatar: firstAvatar,
+            mail: firstMail
           },
         ],
       })
@@ -236,8 +235,8 @@ export default function ChatScreen({ route }) {
           navigation.replace('LaTeX', {
             firstUser: firstUser,
             firstAvatar: firstAvatar,
-            secondUser: secondUser,
-            secondAvatar: secondAvatar,
+            firstMail: firstMail,
+            group: group,
             chatroomId: chatroomId,
             latex: text,
           })
@@ -253,8 +252,10 @@ export default function ChatScreen({ route }) {
     <>
       <Pressable
         onPress={() => {
-          navigation.navigate('Home', {
+          navigation.replace('Home', {
             username: firstUser,
+            mail: firstMail,
+            avatar: firstAvatar,
           })
         }}
         style={styles.actionBar}
@@ -266,11 +267,15 @@ export default function ChatScreen({ route }) {
         renderInputToolbar={(props) => customtInputToolbar(props)}
         messages={messages}
         onSend={(messages) => onSend(messages)}
+        renderUsernameOnMessage={true}
         initialText={text}
         onInputTextChanged={(text) => {
           setText(text)
         }}
-        user={{ _id: firstUser }}
+        user={{ _id: firstUser,
+                name: firstMail,
+                avatar: firstAvatar,
+        }}
         renderActions={() => renderActions()}
         renderMessageText={({ currentMessage }) => (
           <CustomMessage message={currentMessage} />
