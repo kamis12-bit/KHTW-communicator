@@ -23,18 +23,47 @@ import { formulas_pool } from './Formulas.js';
 const LaTeXScreen = ({ route }) => {
   const navigation = useNavigation();
 
-  const {
-    firstUser,
-    firstAvatar,
-    firstMail,
-    group,
-    chatroomId,
-    latex,
-  } = route.params;
+  const { firstUser, firstAvatar, firstMail, group, chatroomId, latex } =
+    route.params;
   const [message, setMessage] = useState(latex);
   const [find, setFind] = useState('');
   const [formulas, setFormulas] = useState(formulas_pool);
   const [position, setPosition] = useState(0);
+  //const [inExpression, setInExpression] = useState(false);
+
+  const parse = () => {
+    if (position == 0) {
+      // setInExpression(false);
+      return false;
+    }
+    var inExp = false;
+    var inlineNotDispExp = true; // true: inline, false: display
+    for (let index = 0; index < position; index++) {
+      if (message[index] == '\\') {
+        index++;
+        continue;
+      }
+      if (message[index] == '$') {
+        if (index > 0 && message[index - 1] == '$') {
+          // double $
+          if (inExp) inlineNotDispExp = false; // beginning display
+          else if (!inExp && inlineNotDispExp) inExp = true;
+          else if (!inExp && !inlineNotDispExp);
+        } else {
+          // single $
+          if (inExp) inExp = false;
+          else if (!inExp) {
+            inExp = true;
+            inlineNotDispExp = true;
+          }
+        }
+      }
+      console.log(message[index], ' ', inExp);
+    }
+    console.log(inExp);
+    //setInExpression(inExp);
+    return inExp;
+  };
 
   const insertText = (text) => {
     console.log(message, ' TEXT: ', text, ' POS: ', position);
@@ -42,6 +71,14 @@ const LaTeXScreen = ({ route }) => {
     const suffix = message.slice(position, message.length);
     setMessage(prefix + text + suffix);
     setPosition(position + text.length);
+  };
+
+  const appendFormula = (item) => {
+    const inExpression = parse();
+    console.log('Cursor is in expression: ', inExpression);
+    if (inExpression) insertText(item.formula);
+    else insertText('$' + item.formula + '$');
+    item.weight++;
   };
 
   const filterFormulas = () => {
@@ -65,11 +102,6 @@ const LaTeXScreen = ({ route }) => {
     }
     setFind('');
     setFormulas(l);
-  };
-
-  const appendFormula = (item) => {
-    insertText('$' + item.formula + '$');
-    item.weight++;
   };
 
   const Item = ({ item }) => (
@@ -179,12 +211,12 @@ const LaTeXScreen = ({ route }) => {
               style={styles.backButton}
               onPress={() => {
                 navigation.replace('Chat', {
-                    firstUser: firstUser,
-                    firstAvatar: firstAvatar,
-                    firstMail: firstMail,
-                    group: group,
-                    chatroomId: chatroomId,
-                    latex: message,
+                  firstUser: firstUser,
+                  firstAvatar: firstAvatar,
+                  firstMail: firstMail,
+                  group: group,
+                  chatroomId: chatroomId,
+                  latex: message,
                 });
               }}>
               <Text style={styles.back_text}>Back To Chat</Text>
