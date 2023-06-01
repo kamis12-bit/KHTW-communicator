@@ -20,6 +20,8 @@ import {
 const HomeScreen = ({route}) => {
     const [users, setUsers] = useState([]);
     const [userToAdd, setUserToAdd] = useState(null);
+    const [nameToAdd, setNameToAdd] = useState(null);
+
     const [myData, setMyData] = useState(null);
     const navigation = useNavigation()
     const { username, mail, avatar } = route.params;
@@ -78,7 +80,7 @@ const HomeScreen = ({route}) => {
     };
 
 
-    const onAddFriend = async names => {
+    const onAddFriend = async (names, groupName) => {
         try {
 
             const database = getDatabase();
@@ -87,8 +89,6 @@ const HomeScreen = ({route}) => {
             //const user = await findUser(name);
             namesLoverCase = names.toLowerCase();
             namesList = namesLoverCase.split(" ");
-            groupName = namesList[0];
-            namesList.shift();
             namesList.push(mail);
             const userss = await getUsersByEmail(namesList);
             const userInfo = userss.map(user => {
@@ -156,10 +156,15 @@ const HomeScreen = ({route}) => {
         <View style={styles.addUser}>
             <TextInput
             style={styles.input}
+            onChangeText={setNameToAdd}
+            value={nameToAdd}
+            />
+            <TextInput
+            style={styles.input}
             onChangeText={setUserToAdd}
             value={userToAdd}
             />
-            <Button title={'Add Chat'} onPress={() => onAddFriend(userToAdd)} />
+            <Button title={'Add Chat'} onPress={() => onAddFriend(userToAdd, nameToAdd)} />
         </View>
         <View>
             <FlatList
