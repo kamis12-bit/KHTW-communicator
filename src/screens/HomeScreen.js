@@ -159,7 +159,7 @@ const HomeScreen = ({route}) => {
             onChangeText={setUserToAdd}
             value={userToAdd}
             />
-            <Button title={'Add User'} onPress={() => onAddFriend(userToAdd)} />
+            <Button title={'Add Chat'} onPress={() => onAddFriend(userToAdd)} />
         </View>
         <View>
             <FlatList
